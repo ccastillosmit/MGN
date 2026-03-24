@@ -1,5 +1,6 @@
 import streamlit as st
 import anthropic
+import httpx
 import base64
 import json
 import re
@@ -338,7 +339,10 @@ El caption:
 {prompt_gemini}
 """
 
-    cliente = anthropic.Anthropic(api_key=api_key)
+    cliente = anthropic.Anthropic(
+        api_key=api_key,
+        http_client=httpx.Client(timeout=120.0)
+    )
     mensaje = cliente.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=1800,
