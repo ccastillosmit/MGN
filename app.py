@@ -423,19 +423,29 @@ with st.sidebar:
 
     st.markdown("<div style='font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:#C4956A; font-weight:700; margin-bottom:0.5rem;'>🔑 API Keys</div>", unsafe_allow_html=True)
 
-    anthropic_key = st.text_input(
-        "Anthropic (Claude)",
-        value="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",
-        type="password",
-        help="Tu API key de Anthropic"
-    )
+    # Leer desde st.secrets si están configurados, sino mostrar campo de texto
+    _default_anthropic = st.secrets.get("ANTHROPIC_API_KEY", "") if hasattr(st, "secrets") else ""
+    _default_gemini    = st.secrets.get("GEMINI_API_KEY", "")    if hasattr(st, "secrets") else ""
 
-    gemini_key = st.text_input(
-        "Gemini (Google)",
-        value="AIzaSyAgb6MQYiVJasBOl6Xze9aQNpyEDGRW3lw",
-        type="password",
-        help="Tu API key de Google AI Studio"
-    )
+    if _default_anthropic:
+        anthropic_key = _default_anthropic
+        st.markdown("<div style='font-size:0.75rem; color:#7AB67A;'>✅ Anthropic key configurada</div>", unsafe_allow_html=True)
+    else:
+        anthropic_key = st.text_input(
+            "Anthropic (Claude)",
+            type="password",
+            help="Tu API key de Anthropic"
+        )
+
+    if _default_gemini:
+        gemini_key = _default_gemini
+        st.markdown("<div style='font-size:0.75rem; color:#7AB67A;'>✅ Gemini key configurada</div>", unsafe_allow_html=True)
+    else:
+        gemini_key = st.text_input(
+            "Gemini (Google)",
+            type="password",
+            help="Tu API key de Google AI Studio"
+        )
 
     st.markdown("---")
 
