@@ -1,0 +1,345 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.app { padding: 1rem; max-width: 480px; margin: 0 auto; }
+.header { background: #1a1a2e; color: white; border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+.header h1 { font-size: 18px; font-weight: 500; }
+.header p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+.week-nav { display: flex; align-items: center; justify-content: space-between; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.5rem 0.75rem; margin-bottom: 1rem; border: 0.5px solid var(--color-border-tertiary); }
+.week-nav button { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--color-text-primary); padding: 0 4px; }
+.week-nav span { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.day-tabs { display: flex; gap: 6px; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 2px; }
+.day-tab { flex-shrink: 0; padding: 6px 14px; border-radius: 20px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); cursor: pointer; color: var(--color-text-secondary); transition: all 0.15s; }
+.day-tab.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+.day-tab.done { border-color: #0F6E56; color: #0F6E56; }
+.section-title { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin: 1rem 0 0.5rem; }
+.exercise-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.75rem 1rem; margin-bottom: 8px; }
+.ex-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 0; }
+.ex-num { background: #1a1a2e; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; margin-top: 1px; }
+.ex-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); flex: 1; line-height: 1.3; }
+.ex-meta { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.ex-note { font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px; font-style: italic; }
+.series-grid { margin-top: 10px; }
+.series-row { display: grid; grid-template-columns: 60px repeat(4, 1fr); gap: 4px; align-items: center; margin-bottom: 4px; }
+.series-label { font-size: 11px; color: var(--color-text-secondary); }
+.serie-cell { text-align: center; }
+.serie-header { font-size: 11px; color: var(--color-text-tertiary); text-align: center; }
+.kg-input { width: 100%; border: 0.5px solid var(--color-border-secondary); border-radius: 6px; padding: 4px; font-size: 13px; text-align: center; background: var(--color-background-secondary); color: var(--color-text-primary); font-family: var(--font-sans); }
+.kg-input:focus { outline: none; border-color: #1a1a2e; }
+.reps-val { font-size: 13px; color: var(--color-text-primary); }
+.cardio-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.75rem 1rem; margin-bottom: 8px; }
+.cardio-tag { font-size: 11px; background: #E1F5EE; color: #0F6E56; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+.save-btn { width: 100%; padding: 12px; background: #1a1a2e; color: white; border: none; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 1rem; }
+.save-btn:active { opacity: 0.85; }
+.progress-section { margin-top: 1.5rem; }
+.progress-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.75rem 1rem; margin-bottom: 8px; }
+.progress-ex-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+.progress-weeks { display: flex; gap: 4px; flex-wrap: wrap; }
+.week-dot { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 36px; }
+.week-dot-label { font-size: 10px; color: var(--color-text-tertiary); }
+.week-dot-val { font-size: 12px; font-weight: 500; color: var(--color-text-primary); background: var(--color-background-secondary); border-radius: 6px; padding: 2px 6px; border: 0.5px solid var(--color-border-tertiary); min-width: 36px; text-align: center; }
+.week-dot-val.has-data { background: #E1F5EE; color: #0F6E56; border-color: #9FE1CB; }
+.tabs-main { display: flex; gap: 0; margin-bottom: 1rem; border-radius: var(--border-radius-md); overflow: hidden; border: 0.5px solid var(--color-border-secondary); }
+.tab-main { flex: 1; padding: 8px; font-size: 13px; border: none; background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; }
+.tab-main.active { background: #1a1a2e; color: white; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1D9E75; color: white; padding: 10px 20px; border-radius: var(--border-radius-md); font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; text-align: center; }
+.stat-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.stat-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+</style>
+
+<div class="app">
+<div class="header">
+  <h1>Plan Megatlon — Mariana</h1>
+  <p>Entrenadora: Florencia Velazquez · Vigencia: 11/02 – 13/03/2026</p>
+</div>
+
+<div class="tabs-main">
+  <button class="tab-main active" onclick="showMainTab('workout')">Entrenamiento</button>
+  <button class="tab-main" onclick="showMainTab('progress')">Progreso</button>
+</div>
+
+<div id="tab-workout">
+  <div class="week-nav">
+    <button onclick="changeWeek(-1)">‹</button>
+    <span id="week-label">Semana 1</span>
+    <button onclick="changeWeek(1)">›</button>
+  </div>
+
+  <div class="day-tabs" id="day-tabs"></div>
+  <div id="workout-content"></div>
+</div>
+
+<div id="tab-progress" style="display:none">
+  <div id="progress-content"></div>
+</div>
+</div>
+
+<div class="toast" id="toast">✓ Guardado</div>
+
+<script>
+const DAYS = {
+  'Pecho + Hombros': {
+    blocks: [
+      { name: 'Movilidad', sets: 2, exercises: [
+        { num:1, name:'Rotación interna de hombro con banda', reps:[12,12], kg:false },
+        { num:2, name:'Rotación externa de hombro con banda', reps:[12,12], kg:false },
+        { num:3, name:'Mariposa con banda', reps:[10,10], kg:false, note:'Parado, desde el medio y unilateral, luego del medio hacia arriba' }
+      ]},
+      { name: 'Entrada en calor', sets: 2, exercises: [
+        { num:4, name:'Cinta – método continuo', reps:['3 min','3 min'], kg:false, note:'PSE 6', cardio:true },
+        { num:5, name:'Plancha prona alta + toque de hombros', reps:[10,10], kg:false },
+        { num:6, name:'Empuje de pecho con barra en banco plano (toma cerrada)', reps:[10,8,6,4], kg:true, note:'Aumentar peso al bajar repeticiones' }
+      ]},
+      { name: 'Bloque 1', sets: 3, exercises: [
+        { num:7, name:'Cruce de pecho con poleas bajas', reps:[10,10,10], kg:true },
+        { num:8, name:'Vuelos frontales en polea', reps:[10,10,10], kg:true, note:'Agarre supino' }
+      ]},
+      { name: 'Bloque 2', sets: 3, exercises: [
+        { num:9, name:'Empuje de hombros con barra (sentado)', reps:[10,10,10], kg:true },
+        { num:10, name:'Vuelos laterales en polea', reps:[8,8,8], kg:true }
+      ]},
+      { name: 'Bloque 3', sets: 3, exercises: [
+        { num:11, name:'Vuelos frontales en polea (prono)', reps:[10,10,10], kg:true, note:'PRONO' },
+        { num:12, name:'Vuelos laterales con mancuernas', reps:[8,8,8], kg:true, note:'Uno en isometría' }
+      ]}
+    ]
+  },
+  'Glúteos + Cuádriceps': {
+    blocks: [
+      { name: 'Cardio inicial', sets: 1, exercises: [
+        { num:1, name:'Cinta – método continuo', reps:['6 min'], kg:false, note:'PSE 8 · Inclinación 4', cardio:true }
+      ]},
+      { name: 'Bloque 1', sets: 3, exercises: [
+        { num:2, name:'Prensa Hammer 45°', reps:[10,10,10], kg:true },
+        { num:3, name:'Desplazamiento lateral con banda', reps:[30,30,30], kg:false, note:'15/15 · puede ser sentadilla isométrica 30 seg' }
+      ]},
+      { name: 'Bloque 2', sets: 3, exercises: [
+        { num:4, name:'Hip Thrust con barra', reps:[10,10,10], kg:true },
+        { num:5, name:'Estocada en banco', reps:[8,8,8], kg:false },
+        { num:6, name:'Sentadilla clásica', reps:[10,8,6,4], kg:true, note:'Aumentar peso al bajar repeticiones' }
+      ]}
+    ]
+  },
+  'Brazos + Core': {
+    blocks: [
+      { name: 'Entrada en calor (zona media)', sets: 3, exercises: [
+        { num:1, name:'Abdominales oblicuos en suspensión', reps:[10,10,10], kg:false, note:'10/10' },
+        { num:2, name:'Escalador de montaña', reps:[30,30,30], kg:false },
+        { num:3, name:'Abdominal recto largo en banco', reps:[15,15,15], kg:false },
+        { num:4, name:'Abdominal recto corto en banco', reps:[15,15,15], kg:false }
+      ]},
+      { name: 'Bloque 1 – Bíceps', sets: 3, exercises: [
+        { num:5, name:'Bíceps con polea', reps:[12,12,12], kg:true },
+        { num:6, name:'Bíceps con polea (isométrico)', reps:[10,10,10], kg:true, note:'Isométrico 10 segundos' }
+      ]},
+      { name: 'Bloque 3 – Tríceps', sets: 3, exercises: [
+        { num:7, name:'Tríceps patada de burro', reps:[12,12,12], kg:true },
+        { num:8, name:'Fondos en paralelas', reps:[12,12,12], kg:false }
+      ]},
+      { name: 'Bloque 4 – Tríceps', sets: 3, exercises: [
+        { num:9, name:'Press francés con barra Ez', reps:[10,8,6], kg:true, note:'Aumentar peso' },
+        { num:10, name:'Flexo-extensión de brazos (tríceps)', reps:[10,10,10], kg:false }
+      ]}
+    ]
+  }
+};
+
+const DAY_KEYS = Object.keys(DAYS);
+let currentWeek = 1;
+let currentDay = DAY_KEYS[0];
+let activeMainTab = 'workout';
+const MAX_WEEKS = 5;
+
+function storageKey(week, day, exNum, serie) {
+  return `mg_w${week}_${day}_ex${exNum}_s${serie}`;
+}
+
+function getKg(week, day, exNum, serie) {
+  try { return localStorage.getItem(storageKey(week, day, exNum, serie)) || ''; } catch(e) { return ''; }
+}
+function setKg(week, day, exNum, serie, val) {
+  try { localStorage.setItem(storageKey(week, day, exNum, serie), val); } catch(e) {}
+}
+
+function showMainTab(tab) {
+  activeMainTab = tab;
+  document.getElementById('tab-workout').style.display = tab === 'workout' ? '' : 'none';
+  document.getElementById('tab-progress').style.display = tab === 'progress' ? '' : 'none';
+  document.querySelectorAll('.tab-main').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && tab==='workout') || (i===1 && tab==='progress'));
+  });
+  if (tab === 'progress') renderProgress();
+}
+
+function changeWeek(delta) {
+  currentWeek = Math.max(1, Math.min(MAX_WEEKS, currentWeek + delta));
+  render();
+}
+
+function render() {
+  document.getElementById('week-label').textContent = `Semana ${currentWeek}`;
+  renderDayTabs();
+  renderWorkout();
+}
+
+function renderDayTabs() {
+  const container = document.getElementById('day-tabs');
+  container.innerHTML = '';
+  DAY_KEYS.forEach(day => {
+    const btn = document.createElement('button');
+    btn.className = 'day-tab' + (day === currentDay ? ' active' : '');
+    btn.textContent = day;
+    btn.onclick = () => { currentDay = day; renderDayTabs(); renderWorkout(); };
+    container.appendChild(btn);
+  });
+}
+
+function renderWorkout() {
+  const container = document.getElementById('workout-content');
+  const dayData = DAYS[currentDay];
+  let html = '';
+  
+  dayData.blocks.forEach(block => {
+    html += `<div class="section-title">${block.name} · ${block.sets} vueltas</div>`;
+    block.exercises.forEach(ex => {
+      if (ex.cardio) {
+        html += `<div class="cardio-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span class="ex-num">${ex.num}</span>
+            <span class="ex-name">${ex.name}</span>
+            <span class="cardio-tag">cardio</span>
+          </div>
+          ${ex.note ? `<div class="ex-note">${ex.note}</div>` : ''}
+          <div style="margin-top:8px;display:flex;gap:8px;">
+            ${ex.reps.map(r => `<span style="font-size:13px;background:var(--color-background-primary);padding:4px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary)">${r}</span>`).join('')}
+          </div>
+        </div>`;
+        return;
+      }
+
+      html += `<div class="exercise-card">
+        <div class="ex-header">
+          <span class="ex-num">${ex.num}</span>
+          <div style="flex:1">
+            <div class="ex-name">${ex.name}</div>
+            ${ex.note ? `<div class="ex-note">${ex.note}</div>` : ''}
+          </div>
+        </div>`;
+
+      if (ex.kg) {
+        html += `<div class="series-grid">
+          <div class="series-row">
+            <span class="series-label"></span>
+            ${ex.reps.map((_,i) => `<span class="serie-header">S${i+1}</span>`).join('')}
+          </div>
+          <div class="series-row">
+            <span class="series-label" style="font-size:11px;color:var(--color-text-secondary)">Reps</span>
+            ${ex.reps.map(r => `<span class="reps-val serie-cell">${r}</span>`).join('')}
+          </div>
+          <div class="series-row">
+            <span class="series-label" style="font-size:11px;color:var(--color-text-secondary)">Kg</span>
+            ${ex.reps.map((_,i) => `<input class="kg-input" type="number" min="0" step="0.5" placeholder="—" value="${getKg(currentWeek, currentDay, ex.num, i+1)}" data-week="${currentWeek}" data-day="${currentDay}" data-ex="${ex.num}" data-serie="${i+1}" oninput="onKgInput(this)">`).join('')}
+          </div>
+        </div>`;
+      } else {
+        html += `<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+          ${ex.reps.map((r,i) => `<span style="font-size:12px;background:var(--color-background-secondary);padding:3px 8px;border-radius:6px;border:0.5px solid var(--color-border-tertiary)">S${i+1}: ${r} reps</span>`).join('')}
+        </div>`;
+      }
+
+      html += `</div>`;
+    });
+  });
+
+  html += `<button class="save-btn" onclick="showToast()">Guardar semana ${currentWeek}</button>`;
+  container.innerHTML = html;
+}
+
+function onKgInput(input) {
+  setKg(input.dataset.week, input.dataset.day, input.dataset.ex, input.dataset.serie, input.value);
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function renderProgress() {
+  const container = document.getElementById('progress-content');
+  
+  let totalSessions = 0;
+  for (let w = 1; w <= MAX_WEEKS; w++) {
+    DAY_KEYS.forEach(day => {
+      const dayData = DAYS[day];
+      let hasAny = false;
+      dayData.blocks.forEach(block => {
+        block.exercises.forEach(ex => {
+          if (ex.kg) {
+            const v = getKg(w, day, ex.num, 1);
+            if (v) hasAny = true;
+          }
+        });
+      });
+      if (hasAny) totalSessions++;
+    });
+  }
+
+  let html = `<div class="stats-grid">
+    <div class="stat-card"><div class="stat-val">${currentWeek}</div><div class="stat-label">Semana actual</div></div>
+    <div class="stat-card"><div class="stat-val">${totalSessions}</div><div class="stat-label">Entrenos con datos</div></div>
+  </div>`;
+
+  DAY_KEYS.forEach(day => {
+    const dayData = DAYS[day];
+    html += `<div class="section-title">${day}</div>`;
+    
+    dayData.blocks.forEach(block => {
+      block.exercises.forEach(ex => {
+        if (!ex.kg) return;
+        
+        const weekVals = [];
+        for (let w = 1; w <= MAX_WEEKS; w++) {
+          const vals = ex.reps.map((_,i) => parseFloat(getKg(w, day, ex.num, i+1))).filter(v => !isNaN(v) && v > 0);
+          weekVals.push(vals.length > 0 ? Math.max(...vals) : null);
+        }
+        
+        const hasData = weekVals.some(v => v !== null);
+        if (!hasData) return;
+
+        html += `<div class="progress-card">
+          <div class="progress-ex-name">${ex.num}. ${ex.name}</div>
+          <div class="progress-weeks">
+            ${weekVals.map((v, i) => `
+              <div class="week-dot">
+                <span class="week-dot-label">S${i+1}</span>
+                <span class="week-dot-val ${v !== null ? 'has-data' : ''}">${v !== null ? v+'kg' : '—'}</span>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      });
+    });
+  });
+
+  html += `<button class="save-btn" style="background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);margin-top:0.5rem" onclick="clearAll()">Borrar todos los datos</button>`;
+  
+  container.innerHTML = html;
+}
+
+function clearAll() {
+  if (!confirm('¿Segura que querés borrar todos los registros?')) return;
+  try {
+    Object.keys(localStorage).filter(k => k.startsWith('mg_')).forEach(k => localStorage.removeItem(k));
+  } catch(e) {}
+  renderProgress();
+  showToast();
+  document.getElementById('toast').textContent = '✓ Datos borrados';
+  setTimeout(() => { document.getElementById('toast').textContent = '✓ Guardado'; }, 2200);
+}
+
+render();
+</script>
